@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Hyundai Booking</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: url('images/5.jpg') no-repeat center center/cover;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: rgba(0, 44, 95, 0.95);
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: 1px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 60px auto;
+      background: rgba(0, 0, 0, 0.75);
+      padding: 40px 30px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+      width: 90%;
+    }
+
+    .container h2 {
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      display: block;
+      background: linear-gradient(90deg, #007bff, #00bfff);
+      color: white;
+      padding: 14px;
+      margin: 15px auto;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: linear-gradient(90deg, #005fa3, #009acd);
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        padding: 25px 20px;
+        margin: 30px auto;
+      }
+
+      .btn {
+        padding: 12px;
+        font-size: 0.95rem;
+      }
+
+      .container h2 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Hyundai Booking Dashboard</h1>
+  </header>
+
+  <div class="container">
+    <h2>Welcome, <span id="usernameDisplay"></span> 👋</h2>
+    <button class="btn" onclick="location.href='booking.html'">📅 Book a Hall</button>
+    <button class="btn" onclick="location.href='mybooking.html'">📖 My Bookings</button>
+    <button class="btn" onclick="logout()">🚪 Logout</button>
+  </div>
+
+  <script>
+    const username = localStorage.getItem("username");
+    document.getElementById("usernameDisplay").textContent = username || "User";
+
+    function logout() {
+      localStorage.clear();
+      location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

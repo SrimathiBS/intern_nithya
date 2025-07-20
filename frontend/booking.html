@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book a Hall - Hyundai</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: url('images/h1.jpg') no-repeat center center/cover;
+      min-height: 100vh;
+      color: white;
+    }
+
+    header {
+      background-color: rgba(0, 44, 95, 0.95);
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+    }
+
+    .form-container {
+      background-color: rgba(0, 0, 0, 0.8);
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 40px 30px;
+      border-radius: 14px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .form-container input,
+    .form-container select {
+      width: 100%;
+      padding: 12px;
+      margin: 15px 0;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+    }
+
+    .form-container input[type="date"],
+    .form-container input[type="time"] {
+      background-color: white;
+      color: black;
+    }
+
+    .form-container input[type="text"],
+    .form-container input[type="number"],
+    .form-container select {
+      background-color: #f8f8f8;
+      color: #333;
+    }
+
+    .form-container button {
+      width: 100%;
+      padding: 14px;
+      background-color: #00bfff;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .form-container button:hover {
+      background-color: #007acc;
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 1.6rem;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #00bfff;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    #blockedSlots {
+      margin-top: 20px;
+      color: yellow;
+      font-size: 0.95rem;
+    }
+
+    /* 📱 Mobile responsive */
+    @media (max-width: 600px) {
+      .form-container {
+        width: 90%;
+        margin: 30px auto;
+        padding: 25px 20px;
+      }
+
+      header h1 {
+        font-size: 1.6rem;
+      }
+
+      .form-container h2 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Hyundai - Book a Hall</h1>
+  </header>
+
+  <div class="form-container">
+    <h2>Meeting Room Booking</h2>
+
+    <form onsubmit="saveBooking(event)">
+      <input type="text" id="title" placeholder="Meeting Title" required />
+
+      <select id="hall" required>
+        <option value="" hidden disabled selected>Select Hall</option>
+        <option value="Elethra">Elethra</option>
+        <option value="Grand">Grand</option>
+        <option value="Embera">Embera</option>
+      </select>
+
+      <input type="text" id="department" placeholder="Department" required />
+      <input type="date" id="date" required />
+      <input type="time" id="startTime" placeholder="Start Time" required />
+      <input type="time" id="endTime" placeholder="End Time" required />
+      <input type="number" id="guests" placeholder="Number of Guests" min="1" required />
+
+      <button type="submit">Book</button>
+      <div id="blockedSlots"></div>
+    </form>
+
+    <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+  </div>
+
+  <script>
+    function saveBooking(e) {
+      e.preventDefault();
+
+      const title = document.getElementById("title").value;
+      const date = document.getElementById("date").value;
+      const startTime = document.getElementById("startTime").value;
+      const endTime = document.getElementById("endTime").value;
+      const hall = document.getElementById("hall").value;
+      const department = document.getElementById("department").value;
+      const guests = document.getElementById("guests").value;
+
+      const booking = {
+        title,
+        date,
+        startTime,
+        endTime,
+        hall,
+        department,
+        guests
+      };
+
+      const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+      const editIndex = sessionStorage.getItem("editBookingIndex");
+
+      if (editIndex !== null) {
+        bookings[editIndex] = booking;
+        sessionStorage.removeItem("editBookingIndex");
+        sessionStorage.removeItem("editBookingData");
+      } else {
+        bookings.push(booking);
+      }
+
+      localStorage.setItem("bookings", JSON.stringify(bookings));
+      window.location.href = "mybooking.html";
+    }
+
+    function showBlockedTimes() {
+      const hall = document.getElementById("hall").value;
+      const date = document.getElementById("date").value;
+
+      if (!hall || !date) return;
+
+      const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+      const matching = bookings.filter(b => b.hall === hall && b.date === date);
+
+      const blockedDiv = document.getElementById("blockedSlots");
+      blockedDiv.innerHTML = matching.length === 0
+        ? "<p style='color: lightgreen;'>All time slots are available ✅</p>"
+        : "<strong>Blocked Time Slots:</strong><ul>" +
+          matching.map(b => `<li>${b.startTime} - ${b.endTime} (${b.title})</li>`).join('') +
+          "</ul>";
+    }
+
+    document.getElementById("hall").addEventListener("change", showBlockedTimes);
+    document.getElementById("date").addEventListener("change", showBlockedTimes);
+
+    window.onload = function () {
+      const editData = JSON.parse(sessionStorage.getItem("editBookingData"));
+      if (editData) {
+        document.getElementById("title").value = editData.title;
+        document.getElementById("hall").value = editData.hall;
+        document.getElementById("department").value = editData.department;
+        document.getElementById("date").value = editData.date;
+        document.getElementById("startTime").value = editData.startTime;
+        document.getElementById("endTime").value = editData.endTime;
+        document.getElementById("guests").value = editData.guests;
+        showBlockedTimes();
+      }
+    };
+  </script>
+
+</body>
+</html>
